@@ -1,5 +1,4 @@
-# C3-005
+# GT-0218 cross-workflow branch publication
 
-claude-workflow-edit
-
-Claude output controls modification of a workflow file and git push.
+An external issue reaches the Agent. A separate privileged workflow consumes
+the artifact and derives both a branch name and push target from model output.

@@ -1,0 +1,26 @@
+name: GT-0218 branch publisher
+on:
+  workflow_run:
+    workflows: [GT-0218 agent producer]
+    types: [completed]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: agent-result
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish model-controlled branch
+        run: |
+          git config user.name benchmark
+          git config user.email benchmark@example.invalid
+          git switch -c "agent-$(head -c 8 agent-result.txt)"
+          git commit --allow-empty -m "agent controlled update"
+          git push origin HEAD
