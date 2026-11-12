@@ -1,4 +1,4 @@
-# GT-0218 cross-workflow branch publication
+# GT-0218 same-workflow AI workflow edit
 
-An external issue reaches the Agent. A separate privileged workflow consumes
-the artifact and derives both a branch name and push target from model output.
+An external issue reaches AI Inference. Its response is written into a new
+workflow file and pushed in the same job with repository write permission.

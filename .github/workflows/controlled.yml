@@ -1,26 +1,29 @@
-name: GT-0218 agent producer
+name: GT-0218 AI output workflow edit
 on:
   issues:
     types: [opened]
 permissions:
-  contents: read
+  contents: write
+  issues: write
   actions: read
   models: read
 jobs:
-  produce:
+  mutate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - id: agent
-        uses: anthropics/claude-code-action@v1
+        uses: actions/ai-inference@v2
         with:
-          allowed_non_write_users: '*'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          model: openai/gpt-4o-mini
           prompt: ${{ github.event.issue.body }}
-      - name: Materialize agent result
+      - name: Apply model result
+        env:
+          AGENT_OUTPUT: ${{ steps.agent.outputs.response }}
         run: |
-          printf '%s\n' "${{ steps.agent.outputs.result }}" > agent-result.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: agent-result
-          path: agent-result.txt
+          printf '%s\n' "$AGENT_OUTPUT" > .github/workflows/generated-security.yml
+          git config user.name benchmark
+          git config user.email benchmark@example.invalid
+          git add .github/workflows/generated-security.yml
+          git commit -m "agent generated workflow"
+          git push origin HEAD
