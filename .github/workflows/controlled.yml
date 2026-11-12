@@ -1,4 +1,4 @@
-name: GT-0218 AI output workflow edit
+name: GT-0218 Claude workflow edit
 on:
   issues:
     types: [opened]
@@ -13,13 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: agent
-        uses: actions/ai-inference@v2
+        uses: anthropics/claude-code-base-action@beta
         with:
-          model: openai/gpt-4o-mini
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: ${{ github.event.issue.body }}
+          allowed_tools: 'Read,Write,Edit,Bash(git:*)'
       - name: Apply model result
         env:
-          AGENT_OUTPUT: ${{ steps.agent.outputs.response }}
+          AGENT_OUTPUT: ${{ steps.agent.outputs.result }}
         run: |
           printf '%s\n' "$AGENT_OUTPUT" > .github/workflows/generated-security.yml
           git config user.name benchmark
